@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyron Medical — AI Patient Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-gradient"></div>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+    </div>
+    <div class="noise-overlay"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="glass-header">
+            <div class="header-left">
+                <div class="logo-mark">
+                    <img src="{% static 'images/kyron_medical_logo.webp' %}" alt="Kyron Medical" class="header-logo">
+                </div>
+                <div class="status-indicator" style="margin-top: 4px;">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Kyra is online</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="glass-btn icon-btn" id="infoBtn" title="Practice Information">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                </button>
+                <button class="glass-btn icon-btn" id="resetBtn" title="New Conversation">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Chat Area -->
+        <main class="chat-area" id="chatArea">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="message assistant-message fade-in">
+                    <div class="message-avatar">
+                        <img src="{% static 'images/kyron_medical_fevicon.webp' %}" alt="Kyra" class="avatar-img">
+                    </div>
+                    <div class="message-content glass-message">
+                        <p>Hi! I'm <strong>Kyra</strong>, your AI assistant at Kyron Medical. 👋</p>
+                        <p>I can help you with:</p>
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" data-message="I'd like to schedule an appointment">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                Schedule Appointment
+                            </button>
+                            <button class="quick-action-btn" data-message="I need a prescription refill">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.5 20H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H20a2 2 0 0 1 2 2v2"/><circle cx="17" cy="17" r="3"/><path d="m21 21-1.5-1.5"/></svg>
+                                Prescription Refill
+                            </button>
+                            <button class="quick-action-btn" data-message="What are your office hours and address?">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                                Hours & Location
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Voice Call Banner (hidden by default) -->
+        <div class="voice-banner glass-panel" id="voiceBanner" style="display:none;">
+            <div class="voice-banner-content">
+                <div class="voice-pulse">
+                    <span></span><span></span><span></span>
+                </div>
+                <p>Voice call in progress with Kyra...</p>
+                <button class="glass-btn btn-sm" id="endVoiceBtn">End Call</button>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <footer class="input-area">
+            <div class="input-container glass-input">
+                <button class="voice-call-btn" id="voiceCallBtn" title="Switch to voice call">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </button>
+                <textarea
+                    id="messageInput"
+                    placeholder="Type your message..."
+                    rows="1"
+                    autofocus
+                ></textarea>
+                <button class="send-btn" id="sendBtn" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="disclaimer">Kyra is an AI assistant and cannot provide medical advice. For emergencies, call 911.</p>
+        </footer>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal glass-panel">
+            <div class="modal-header">
+                <h2>Kyron Medical Practice</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-section">
+                    <h3>📍 Address</h3>
+                    <p>{{ practice.address }}</p>
+                </div>
+                <div class="info-section">
+                    <h3>📞 Phone</h3>
+                    <p>{{ practice.phone }}</p>
+                </div>
+                <div class="info-section">
+                    <h3>🕐 Hours</h3>
+                    {% for day, hours in practice.hours.items %}
+                    <div class="hours-row">
+                        <span>{{ day }}</span>
+                        <span>{{ hours }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="info-section">
+                    <h3>👨‍⚕️ Our Doctors</h3>
+                    {% for doc in doctors %}
+                    <div class="doctor-card glass-card">
+                        <strong>{{ doc.name }}</strong>
+                        <span class="doctor-specialty">{{ doc.specialty }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMS Opt-in Modal -->
+    <div class="modal-overlay" id="smsModal">
+        <div class="modal glass-panel modal-sm">
+            <div class="modal-header">
+                <h2>SMS Notifications</h2>
+                <button class="close-modal" id="closeSmsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Would you like to receive appointment reminders and updates via text message?</p>
+                <div class="modal-actions">
+                    <button class="glass-btn btn-primary" id="smsOptInBtn">Yes, opt me in</button>
+                    <button class="glass-btn" id="smsDeclineBtn">No thanks</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.KYRON_FAVICON_URL = "{% static 'images/kyron_medical_fevicon.webp' %}";
+    </script>
+    <script src="{% static 'js/chat.js' %}"></script>
+</body>
+</html>
